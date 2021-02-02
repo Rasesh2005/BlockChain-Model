@@ -1,35 +1,86 @@
 from Block import Block
 from Transaction import Transaction
 class BlockChain:
+    """
+A class for Making A Block In A Blockchain
+
+    ...
+
+    Attributes
+    ----------
+    pendingTransactions : list
+        A variable storing all the pending transactions to be executed by next block
+    chain : list
+        A list Representing the Blockchain containing Genesis Block(first block without transaction)
+        
+    difficulty : int
+        The difficulty of mining a block
+        refer Block.mineBlock function for detail
+    miningReward : int
+        The Number of coins a miner gets as rewrd for mining a block
+
+    Methods
+    -------
+    createGenesisBlock():
+        returns A Genesis Block
+    getLatestBlock():
+        returns The Last Block in blockchain
+    minePendingTransactions():
+        fills a new block with all pending transactions,
+        mines it and then adds it to bockchain.
+    createTransaction(transaction):
+        adds new transaction in pendingTransactions list
+    getBalanceOfAddress(address):
+        returns balance of user (address)
+    checkValidity():
+        checks for data tamper in Blockchain, 
+        returns true if valid and false if some data is tampered
+    """
     def __init__(self) -> None:
         self.pendingTransactions=[]
         self.chain=[self.createGenesisBlock()]     
-        self.difficulty=2
-        # Miners Get coins on mining a new block...
+        self.difficulty=3
+        # Miners Get coins as reward on mining a new block...
         self.miningReward=100
 
-    def createGenesisBlock(self):
-        return Block(self.pendingTransactions,"0000")
+    def createGenesisBlock(self)->Block:
+        """
+        creates A Genesis Block and returns it
+        """
+        return Block(self.pendingTransactions,previousHash="0000")
 
 
-    def getLatestBlock(self):
-        return self.chain[len(self.chain)-1]
+    def getLatestBlock(self)->Block:
+        """
+        returns The Last Block in blockchain
+        """
+        return self.chain[-1]
 
-    def minePendingTransactions(self,miningRewardAddress):
+    def minePendingTransactions(self,miningRewardAddress:str)->None:
+        """
+        fills a new block with all pending transactions,
+        mines it and then adds it to bockchain.
+        """
         block=Block(transactions=self.pendingTransactions,previousHash=self.getLatestBlock().hash)
         block.mineBlock(self.difficulty)
 
         print(f"Block Successfully mined by user {miningRewardAddress}")
         self.chain.append(block)
-
+        # adding the miningreward to the user who mined current block
         self.pendingTransactions=[
             Transaction(None,miningRewardAddress,self.miningReward)
         ]
-    def createTransaction(self,transaction):
+
+    def createTransaction(self,transaction:Transaction)->None:
+        """
+        adds new transaction in pendingTransactions list
+        """
         self.pendingTransactions.append(transaction)
 
-
-    def getBalanceOfAddress(self,address):
+    def getBalanceOfAddress(self,address:str)->int:
+        """
+        returns balance of user (address)
+        """
         balance=0
 
         for block in self.chain:
@@ -40,20 +91,28 @@ class BlockChain:
                     balance+=t.amount
         return balance
         
-    
-    ## Adding A Block Without Reward
-    # def addBlock(self,newBlock):
-    #     newBlock.previousHash=self.getLatestBlock().hash
-    #     newBlock.mineBlock(self.difficulty)
-    #     self.chain.append(newBlock)
-    def checkValidity(self):
+    # Adding A Block Without Reward
+    # Not in use
+    def addBlock(self,newBlock:Block)->None:
+        newBlock.previousHash=self.getLatestBlock().hash
+        newBlock.mineBlock(self.difficulty)
+        self.chain.append(newBlock)
+
+    def checkValidity(self)->bool:
+        """
+        checks for data tamper in Blockchain, 
+        returns true if valid and false if some data is tampered
+        """
         for i in range(1,len(self.chain)):
             currentBlock=self.chain[i]
             prevBlock=self.chain[i-1]
+            # Checks for change in data in current block
             if currentBlock.hash!=currentBlock.generateHash():
                 return False
+            # Checks for broken link if the hash has been regenerated
             if currentBlock.previousHash!=prevBlock.hash:
                 return False
         return True
+
     def __repr__(self) -> str:
         return str({"BlockChain":{i:item for i,item in enumerate(self.chain)}})
