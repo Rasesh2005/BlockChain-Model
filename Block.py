@@ -20,7 +20,7 @@ class Block:
         This variable is used to distinguish 
         2 different blocks with similar transactions,
         else they would have the same hash.
-        
+
     previousHash : str
         The hash of previous block
     transactions : list
@@ -76,8 +76,15 @@ class Block:
                 "Current block not linked with blockchain")
         return hashlib.sha256(f"{self.previousHash}{self.timeStamp}{self.transactions}{self.nonce}".encode()).hexdigest()
 
+    def hasValidTransactions(self,public_key):
+        for tx in self.transactions:
+            if not tx.isValid(public_key):
+                return False
+
+        return True
+
     # Proof Of Work Or Mining Block of BlockChain
-    def mineBlock(self, difficulty: int) -> None:
+    def mineBlock(self, difficulty: int,public_key) -> None:
         """
         A function for proof of work or mining of block
 
@@ -96,9 +103,12 @@ class Block:
             it is the number of 0s at beginning of hash...
         """
         self.hash = self.generateHash()
+        if not self.hasValidTransactions(public_key):
+            raise Exception("Some transactions are not valid in current Block")
         while self.hash[:difficulty] != "0"*difficulty:
             self.nonce += 1
             self.hash = self.generateHash()
+
 
     def __repr__(self) -> str:
         return str({"timestamp": self.timeStamp, "transactions": self.transactions, "previousHash": self.previousHash, "hash": self.hash})

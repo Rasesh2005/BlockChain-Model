@@ -1,10 +1,14 @@
 from Block import Block
 from BlockChain import BlockChain
 from Transaction import Transaction
+from ellipticcurve.privateKey import PrivateKey
 
+
+privateKey=PrivateKey()
+publicKey=privateKey.publicKey()
+signing_keypair=(privateKey,publicKey)
 # Creating a BlockChain
 bitcoin=BlockChain()
-
 '''
 Making A Block and mining It
 '''
@@ -25,20 +29,22 @@ Making A Block and mining It
 
 
 # If Data is tampered return False
-# print(bitcoin.checkValidity())
 
 
 # print(bitcoin)
+tx=Transaction(publicKey,'add2',100)
+tx.sign(signing_keypair)
+bitcoin.addTransaction(tx,public_key=publicKey)
+tx=Transaction(publicKey,'add2',200)
+tx.sign(signing_keypair)
+bitcoin.addTransaction(tx,public_key=publicKey)
 
-# bitcoin.createTransaction(Transaction('add1','add2',100))
-# bitcoin.createTransaction(Transaction('add2','add1',200))
 
-
-# print("Mining Pending Transactions")
-# # address add3 starts mining to get reward of 100 bitcoin
-# bitcoin.minePendingTransactions("addd3")
-# # add1 will mine transactions which contains the reward transaction of add3
-# bitcoin.minePendingTransactions("add1")
+print("Mining Pending Transactions")
+# address add3 starts mining to get reward of 100 bitcoin
+bitcoin.minePendingTransactions("add3",publicKey)
+# add1 will mine transactions which contains the reward transaction of add3
+bitcoin.minePendingTransactions("add1",publicKey)
 
 # print("Balance Of User add3:",bitcoin.getBalanceOfAddress("add3"))
-# print("Balance Of User add3:",bitcoin.getBalanceOfAddress("add3"))
+print("IS BlockChain Valid??",bitcoin.isChainValid(publicKey))

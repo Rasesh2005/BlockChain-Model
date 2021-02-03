@@ -28,11 +28,11 @@ A class for Making A Block In A Blockchain
     minePendingTransactions():
         fills a new block with all pending transactions,
         mines it and then adds it to bockchain.
-    createTransaction(transaction):
+    addTransaction(transaction):
         adds new transaction in pendingTransactions list
     getBalanceOfAddress(address):
         returns balance of user (address)
-    checkValidity():
+    isChainValid():
         checks for data tamper in Blockchain, 
         returns true if valid and false if some data is tampered
     """
@@ -56,13 +56,13 @@ A class for Making A Block In A Blockchain
         """
         return self.chain[-1]
 
-    def minePendingTransactions(self,miningRewardAddress:str)->None:
+    def minePendingTransactions(self,miningRewardAddress:str,public_key)->None:
         """
         fills a new block with all pending transactions,
         mines it and then adds it to bockchain.
         """
         block=Block(transactions=self.pendingTransactions,previousHash=self.getLatestBlock().hash)
-        block.mineBlock(self.difficulty)
+        block.mineBlock(self.difficulty,public_key)
 
         print(f"Block Successfully mined by user {miningRewardAddress}")
         self.chain.append(block)
@@ -71,10 +71,14 @@ A class for Making A Block In A Blockchain
             Transaction(None,miningRewardAddress,self.miningReward)
         ]
 
-    def createTransaction(self,transaction:Transaction)->None:
+    def addTransaction(self,transaction:Transaction,public_key)->None:
         """
         adds new transaction in pendingTransactions list
         """
+        if not transaction.sentFrom or not transaction.sentTo:
+            raise Exception("Transaction Must Contain From and To Address");
+        if not transaction.isValid(public_key):
+            raise Exception("Cannot add invalid transaction to chain")
         self.pendingTransactions.append(transaction)
 
     def getBalanceOfAddress(self,address:str)->int:
@@ -98,7 +102,7 @@ A class for Making A Block In A Blockchain
         newBlock.mineBlock(self.difficulty)
         self.chain.append(newBlock)
 
-    def checkValidity(self)->bool:
+    def isChainValid(self,public_key)->bool:
         """
         checks for data tamper in Blockchain, 
         returns true if valid and false if some data is tampered
@@ -106,6 +110,8 @@ A class for Making A Block In A Blockchain
         for i in range(1,len(self.chain)):
             currentBlock=self.chain[i]
             prevBlock=self.chain[i-1]
+            if not currentBlock.hasValidTransactions(public_key=public_key):
+                return False
             # Checks for change in data in current block
             if currentBlock.hash!=currentBlock.generateHash():
                 return False
