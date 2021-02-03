@@ -56,13 +56,17 @@ A class for Making A Block In A Blockchain
         """
         return self.chain[-1]
 
-    def minePendingTransactions(self,miningRewardAddress:str,public_key)->None:
+    def minePendingTransactions(self,miningRewardAddress:str)->None:
         """
         fills a new block with all pending transactions,
         mines it and then adds it to bockchain.
+                Parameter
+        ---------
+        miningRewardAddress : PublicKey
+            the public key of the user's bitcoin wallet
         """
         block=Block(transactions=self.pendingTransactions,previousHash=self.getLatestBlock().hash)
-        block.mineBlock(self.difficulty,public_key)
+        block.mineBlock(self.difficulty,miningRewardAddress)
 
         print(f"Block Successfully mined by user {miningRewardAddress}")
         self.chain.append(block)
@@ -84,6 +88,10 @@ A class for Making A Block In A Blockchain
     def getBalanceOfAddress(self,address:str)->int:
         """
         returns balance of user (address)
+                Parameter
+        ---------
+        address : PublicKey
+            the public key of the user's bitcoin wallet whose balance is to be calculated
         """
         balance=0
 
@@ -106,6 +114,10 @@ A class for Making A Block In A Blockchain
         """
         checks for data tamper in Blockchain, 
         returns true if valid and false if some data is tampered
+        Parameter
+        ---------
+        public_key : PublicKey
+            the public key of the user's bitcoin wallet
         """
         for i in range(1,len(self.chain)):
             currentBlock=self.chain[i]

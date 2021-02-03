@@ -35,16 +35,16 @@ Making A Block and mining It
 tx=Transaction(publicKey,'add2',100)
 tx.sign(signing_keypair)
 bitcoin.addTransaction(tx,public_key=publicKey)
-tx=Transaction(publicKey,'add2',200)
+tx=Transaction(publicKey,'add3',200)
 tx.sign(signing_keypair)
 bitcoin.addTransaction(tx,public_key=publicKey)
 
 
 print("Mining Pending Transactions")
 # address add3 starts mining to get reward of 100 bitcoin
-bitcoin.minePendingTransactions("add3",publicKey)
-# add1 will mine transactions which contains the reward transaction of add3
-bitcoin.minePendingTransactions("add1",publicKey)
+bitcoin.minePendingTransactions("add3")
+# the user with wallet ID {publicKey} will mine transactions which contains the reward transaction of add3
+bitcoin.minePendingTransactions(publicKey)
 
-# print("Balance Of User add3:",bitcoin.getBalanceOfAddress("add3"))
+print("Balance Of User add3:",bitcoin.getBalanceOfAddress(publicKey))
 print("IS BlockChain Valid??",bitcoin.isChainValid(publicKey))

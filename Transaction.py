@@ -51,6 +51,13 @@ class Transaction:
             self.txHash,signing_keypair[0])
 
     def isValid(self, public_key):
+        """
+        Validates the transaction if it is signed by sender or it is a reward transaction or none of these
+        Parameter
+        ---------
+        public_key : PublicKey
+            the public key of the user's bitcoin wallet
+        """
         if self.sentFrom is None:
             return True
 
