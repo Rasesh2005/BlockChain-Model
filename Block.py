@@ -77,6 +77,13 @@ class Block:
         return hashlib.sha256(f"{self.previousHash}{self.timeStamp}{self.transactions}{self.nonce}".encode()).hexdigest()
 
     def hasValidTransactions(self,public_key):
+        """
+        Function to check if all trnsaction in self.transactions are valid and signed by sender
+        Parameter
+        ---------
+        public_key : PublicKey
+            the public key of the user's bitcoin wallet
+        """
         for tx in self.transactions:
             if not tx.isValid(public_key):
                 return False
