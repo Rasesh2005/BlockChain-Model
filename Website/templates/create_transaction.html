@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Create Transaction{% endblock %}
+{%block head%}{%endblock%}
+{%block body%}
+<div class="container">
+    <h2>Create Transaction</h2>
+    <form method="post" action="/create_transaction/">
+        <input type="hidden" name="formType" value="changeProfile">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="inputEmail4">Wallet ID: </label>
+                    <input type="text" name="sendFrom" value="{{publicKey}}" required class="form-control disabled" id="WalletID" aria-disabled="true" placeholder="Your Name">
+                </div>
+                
+            </div>
+            <div class="form-group">
+                <label for="inputAddress">Send to: </label>
+                <input type="text" name="sendTo" class="form-control" id="sendTo" required autofocus  placeholder="Address">
+            </div>
+            <div class="form-group">
+                <label for="inputAddress">Amount: </label>
+                <input type="number" name="amount" class="form-control" id="amount" required maxlength="6"   placeholder="Address">
+            </div>
+        
+            <input type="submit" class="btn btn-primary mt-2" name="btn" value="Sign and Transfer">
+    </form>
+</div>
+
+{%endblock%}

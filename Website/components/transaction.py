@@ -1,6 +1,18 @@
 import hashlib
 
+def to_string(key,isPublic):
+    if isPublic:
+        return key.to_pem()[len(b"-----BEGIN PUBLIC KEY-----\n"):-len(b"\n-----END PUBLIC KEY-----\n")].decode()
+    return key.to_pem()[len(b"-----BEGIN EC PRIVATE KEY-----\n"):-len(b"\n-----END EC PRIVATE KEY-----\n")].decode()
 
+def remove_escapeChar(word):
+    res=""
+    for i in word:
+        if i not in ['\n','\t','\r','\b']:
+            res+=i
+
+    return res
+    
 class Transaction:
     """
     A Class Containing All Transaction information
@@ -44,8 +56,8 @@ class Transaction:
             contains pair of keys (private_key,public_key)
         """
         pvt_key,pub_key=signing_keypair
-        if pub_key != self.sentFrom:
-            raise Exception("You Cannot Sign transaction for other's wallets")
+        if remove_escapeChar(to_string(pub_key,True)) != self.sentFrom:
+            raise Exception(f"You Cannot Sign transaction for other's wallets: \n{remove_escapeChar(to_string(pub_key,True))} != \n{self.sentFrom}")
         self.txHash = self.generateHash()
         self.signature = pvt_key.sign(self.txHash.encode())
 
@@ -57,14 +69,14 @@ class Transaction:
         public_key : PublicKey
             the public key of the user's bitcoin wallet
         """
-        if self.sentFrom is None:
+        if self.sentFrom == "SYSTEM":
             return True
 
-        if not self.signature or not len(str(self.signature)):
+        if not self.signature or not len(self.signature):
             raise Exception("Transaction Not Signed")
 
         valid = public_key.verify(self.signature, self.txHash.encode())
         return valid
 
     def __repr__(self) -> str:
-        return str({"sentFrom": self.sentFrom, "sentTo": self.sentTo, "amount": self.amount})
+        return str({"sentFrom": str(self.sentFrom), "sentTo": str(self.sentTo), "amount": self.amount})

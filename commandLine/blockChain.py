@@ -48,7 +48,7 @@ A class for Making A Block In A Blockchain
         """
         creates A Genesis Block and returns it
         """
-        return Block(self.pendingTransactions,previousHash="0000")
+        return Block([self.pendingTransactions],previousHash="0000")
 
 
     def getLatestBlock(self)->Block:

@@ -5,11 +5,25 @@ from blockChain import BlockChain
 from transaction import Transaction
 from ecdsa import SigningKey
 
+def to_string(key,isPublic):
+    if isPublic:
+        return key.to_pem()[len(b"-----BEGIN PUBLIC KEY-----\n"):-len(b"\n-----END PUBLIC KEY-----\n")].decode()
+    return key.to_pem()[len(b"-----BEGIN EC PRIVATE KEY-----\n"):-len(b"\n-----END EC PRIVATE KEY-----\n")].decode()
+
+
+def to_pem(key_str,isPublic):
+    if isPublic:
+        return b"-----BEGIN PUBLIC KEY-----\n"+key_str.encode()+b"\n-----END PUBLIC KEY-----\n"
+    return b"-----BEGIN EC PRIVATE KEY-----\n"+key_str.encode()+b"\n-----END EC PRIVATE KEY-----\n"
 
 privateKey=SigningKey.generate()
 publicKey=privateKey.verifying_key
-signature=privateKey.sign("message".encode())
-assert publicKey.verify(signature,"message".encode())
+print(privateKey.to_pem())
+print(publicKey.to_pem())
+print("Private Key: ",to_string(privateKey,False))
+print("Public Key: ",to_string(publicKey,True))
+signature=privateKey.sign("message".encode('utf-8'))
+assert publicKey.verify(signature,"message".encode('utf-8'))
 signing_keypair=(privateKey,publicKey)
 # Creating a BlockChain
 bitcoin=BlockChain()

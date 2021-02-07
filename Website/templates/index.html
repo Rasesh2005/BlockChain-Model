@@ -1,15 +1,3 @@
-<!--
-<div class="card">
-  <div class="card-header">
-    Featured
-  </div>
-  <ul class="list-group list-group-flush">
-    <li class="list-group-item">Cras justo odio</li>
-    <li class="list-group-item">Dapibus ac facilisis in</li>
-    <li class="list-group-item">Vestibulum at eros</li>
-  </ul>
-</div>
--->
 {% extends "base.html" %}
 {% block title %}Home Page{% endblock %}
 {%block head%}
@@ -31,20 +19,68 @@
 {%endblock%}
 {% block body %}
 <div class="container dx">
-    {% for block in blocks%}
-    <div class="card" id="block-{{loop.index}}">
+    {% for item in blocks%}
+    <div class="card" id="block-{{loop.index}}" onclick="reply_click(this.id)">
       <div class="card-header">
         Block {{loop.index}} {%if loop.index==1%} <small>(Genesis Block)</small>{%endif%}
       </div>
       <ul class="list-group list-group-flush">
         <li class="list-group-item"><h3>Hash</h3>
-        {{block.hash[0:28]}}... <br>
+        {{item.hash[0:28]}}... <br>
         <h3>Previous Block Hash</h3>
-        {{block.previousHash}}</li>
-        <li class="list-group-item"><h3>Nonce</h3>{{block.nonce}}</li>
-        <li class="list-group-item">{{block.timestamp}}</li>
+        {%if item.previousHash!="0000"%}
+        {{item.previousHash[0:28]}}...</li>
+        {%else%}
+        {{item.previousHash}}</li>
+        {%endif%}
+
+        <li class="list-group-item"><h3>Nonce</h3>{{item.nonce}}</li>
+        <li class="list-group-item"><h4>TimeStamp</h4>{{item.timeStamp}}</li>
       </ul>
     </div>
     {%endfor%}
 </div>
+<div class="container">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Sent From</th>
+        <th>Sent To</th>
+        <th>Amount</th>
+      </tr>
+    </thead>
+    <tbody id="transactions">
+
+    </tbody>
+  </table>
+</div>
 {% endblock %}
+{%block script%}
+<script>
+  function reply_click(id){
+    updateTransactions(id)
+  }
+  function updateTransactions(id){
+    selected=document.getElementById(id)
+    index=parseInt(id.slice(6,id.length))-1
+    console.log(index);
+    blocks=[];
+    {%for block in blocks%}
+    blocks.push({{block|safe}});
+    {%endfor%}
+    txs=[]
+    txs=blocks[index]["transactions"]
+    html=``;
+    txs.forEach((el)=>{
+      html+=`<tr>
+        <td>${el['sentFrom'].slice(0,28)}...</td>
+        <td>${el['sentTo'].slice(0,28)}...</td>
+        <td>${el['amount']}</td>
+      </tr>`
+    })
+
+    document.getElementById('transactions').innerHTML=html
+    console.log(html)
+  }
+</script>
+{%endblock%}

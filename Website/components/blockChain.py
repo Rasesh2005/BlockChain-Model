@@ -1,5 +1,19 @@
 from .block import Block
 from .transaction import Transaction
+
+def to_string(key,isPublic):
+    if isPublic:
+        return key.to_pem()[len(b"-----BEGIN PUBLIC KEY-----\n"):-len(b"\n-----END PUBLIC KEY-----\n")].decode()
+    return key.to_pem()[len(b"-----BEGIN EC PRIVATE KEY-----\n"):-len(b"\n-----END EC PRIVATE KEY-----\n")].decode()
+
+def remove_escapeChar(word):
+    res=""
+    for i in word:
+        if i not in ['\n','\t','\r','\b']:
+            res+=i
+
+    return res
+    
 class BlockChain:
     """
 A class for Making A Block In A Blockchain
@@ -47,7 +61,7 @@ A class for Making A Block In A Blockchain
         """
         creates A Genesis Block and returns it
         """
-        genBlock=Block(self.pendingTransactions,previousHash="0000")
+        genBlock=Block([Transaction("SYSTEM","SYSTEM",0)],previousHash="0000")
         genBlock.hash=genBlock.generateHash()
         return genBlock
 
@@ -71,11 +85,11 @@ A class for Making A Block In A Blockchain
         block=Block(transactions=self.pendingTransactions,previousHash=self.getLatestBlock().hash)
         block.mineBlock(self.difficulty,miningRewardAddress)
 
-        print(f"Block Successfully mined by user {miningRewardAddress}")
+        print(f"Block Successfully mined...")
         self.chain.append(block)
         # adding the miningreward to the user who mined current block
         self.pendingTransactions=[
-            Transaction(None,miningRewardAddress,self.miningReward)
+            Transaction("SYSTEM",remove_escapeChar(to_string(miningRewardAddress,True)),self.miningReward)
         ]
 
     def addTransaction(self,transaction:Transaction,public_key)->None:
@@ -88,7 +102,7 @@ A class for Making A Block In A Blockchain
             raise Exception("Cannot add invalid transaction to chain")
         self.pendingTransactions.append(transaction)
 
-    def getBalanceOfAddress(self,address:str)->int:
+    def getBalanceOfAddress(self,address:str,initBalance=0)->int:
         """
         returns balance of user (address)
                 Parameter
@@ -96,14 +110,14 @@ A class for Making A Block In A Blockchain
         address : PublicKey
             the public key of the user's bitcoin wallet whose balance is to be calculated
         """
-        balance=0
+        balance=int(initBalance)
 
         for block in self.chain:
             for t in block.transactions:
                 if t.sentFrom==address:
-                    balance-=t.amount
+                    balance-=int(t.amount)
                 if t.sentTo==address:
-                    balance+=t.amount
+                    balance+=int(t.amount)
         return balance
         
     # Adding A Block Without Reward
