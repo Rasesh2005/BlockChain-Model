@@ -1,13 +1,14 @@
 from flask import Flask,redirect,render_template,request,session
+from ecdsa import SigningKey
+from argon2 import PasswordHasher
+
 from commandLine.blockChain import BlockChain
 from commandLine.transaction import Transaction
-from ellipticcurve.privateKey import PrivateKey
-from argon2 import PasswordHasher
 
 ph=PasswordHasher()
 mycoin=BlockChain()
 users={}
-privateKeys=set()
+publicKeys=set()
 '''
 Will store key value pair of user:
     username:
@@ -19,22 +20,27 @@ Will store key value pair of user:
         balance:500 by default
     }
 '''
-MAX_TRANSACTIONS=5 # maximum number of transactions to be processed in one block
+MAX_TRANSACTIONS=1 # maximum number of transactions to be processed in one block
 app=Flask(__name__)
-
+app.secret_key="VerySecretKey"
 def generateKeypair():
-    n=len(privateKeys)
+    print("Generating Key")
+    n=len(publicKeys)
     privateKey=publicKey=None
-    while n==len(privateKeys):
-        privateKey=PrivateKey()
-        publicKey=privateKey.publicKey()
+    while n==len(publicKeys):
+        print("Running")
+        privateKey=SigningKey.generate()
+        publicKey=privateKey.verifying_key
+        signature=privateKey.sign("message".encode())
+        assert publicKey.verify(signature,"message".encode())
+        publicKeys.add(publicKey.to_string())
     return privateKey,publicKey
 @app.route('/')
 def homePage():
     if "user"in session:
-        return render_template("index.html") # add arguments
+        return render_template("index.html",blocks=mycoin.chain) # add arguments
     else:
-        redirect("/login/")
+        return redirect("/login/")
 
 @app.route("/login/",methods=["GET","POST"])
 def  loginPage():
@@ -86,4 +92,4 @@ def settingsPage():
         return render_template("settings.html",miningReward=users[session["user"]]["mineReward"],balance=users[session["user"]]["balance"])
 
 if __name__=="__main__":
-    app.run(Debug=True)
+    app.run(debug=True)

@@ -1,13 +1,15 @@
 """
 Try Different Thing in this file to get understanding of how it works
 """
-from .blockChain import BlockChain
-from .transaction import Transaction
-from ellipticcurve.privateKey import PrivateKey
+from blockChain import BlockChain
+from transaction import Transaction
+from ecdsa import SigningKey
 
 
-privateKey=PrivateKey()
-publicKey=privateKey.publicKey()
+privateKey=SigningKey.generate()
+publicKey=privateKey.verifying_key
+signature=privateKey.sign("message".encode())
+assert publicKey.verify(signature,"message".encode())
 signing_keypair=(privateKey,publicKey)
 # Creating a BlockChain
 bitcoin=BlockChain()
@@ -44,7 +46,7 @@ bitcoin.addTransaction(tx,public_key=publicKey)
 
 print("Mining Pending Transactions")
 # address add3 starts mining to get reward of 100 bitcoin
-bitcoin.minePendingTransactions("add3")
+# bitcoin.minePendingTransactions("add3")
 # the user with wallet ID {publicKey} will mine transactions which contains the reward transaction of add3
 bitcoin.minePendingTransactions(publicKey)
 

@@ -1,0 +1,50 @@
+<!--
+<div class="card">
+  <div class="card-header">
+    Featured
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Cras justo odio</li>
+    <li class="list-group-item">Dapibus ac facilisis in</li>
+    <li class="list-group-item">Vestibulum at eros</li>
+  </ul>
+</div>
+-->
+{% extends "base.html" %}
+{% block title %}Home Page{% endblock %}
+{%block head%}
+  <style>
+  .card{
+    display: inline-block;
+    width: 18rem;
+    margin: 5px;
+    border:1px solid;
+    margin-bottom:4px;
+  }
+  .dx{
+    width:100%;
+    height:fit-content;
+    overflow-y:scroll;
+    white-space: nowrap;
+  }
+</style>
+{%endblock%}
+{% block body %}
+<div class="container dx">
+    {% for block in blocks%}
+    <div class="card" id="block-{{loop.index}}">
+      <div class="card-header">
+        Block {{loop.index}} {%if loop.index==1%} <small>(Genesis Block)</small>{%endif%}
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><h3>Hash</h3>
+        {{block.hash[0:28]}}... <br>
+        <h3>Previous Block Hash</h3>
+        {{block.previousHash}}</li>
+        <li class="list-group-item"><h3>Nonce</h3>{{block.nonce}}</li>
+        <li class="list-group-item">{{block.timestamp}}</li>
+      </ul>
+    </div>
+    {%endfor%}
+</div>
+{% endblock %}

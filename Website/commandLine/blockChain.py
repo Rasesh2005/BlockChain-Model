@@ -1,6 +1,5 @@
-from re import IGNORECASE
-from block import Block
-from transaction import Transaction
+from .block import Block
+from .transaction import Transaction
 class BlockChain:
     """
 A class for Making A Block In A Blockchain
@@ -48,7 +47,10 @@ A class for Making A Block In A Blockchain
         """
         creates A Genesis Block and returns it
         """
-        return Block(self.pendingTransactions,previousHash="0000")
+        genBlock=Block(self.pendingTransactions,previousHash="0000")
+        genBlock.hash=genBlock.generateHash()
+        return genBlock
+
 
 
     def getLatestBlock(self)->Block:
@@ -69,7 +71,7 @@ A class for Making A Block In A Blockchain
         block=Block(transactions=self.pendingTransactions,previousHash=self.getLatestBlock().hash)
         block.mineBlock(self.difficulty,miningRewardAddress)
 
-        print(f"Block Successfully mined")
+        print(f"Block Successfully mined by user {miningRewardAddress}")
         self.chain.append(block)
         # adding the miningreward to the user who mined current block
         self.pendingTransactions=[
