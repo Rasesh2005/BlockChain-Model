@@ -1,5 +1,5 @@
-from Block import Block
-from Transaction import Transaction
+from .block import Block
+from .transaction import Transaction
 class BlockChain:
     """
 A class for Making A Block In A Blockchain

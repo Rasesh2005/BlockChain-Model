@@ -1,4 +1,4 @@
-from errors import BlockNotLinkedError
+from .errors import BlockNotLinkedError
 import hashlib
 import time
 

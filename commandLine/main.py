@@ -1,6 +1,8 @@
-from Block import Block
-from BlockChain import BlockChain
-from Transaction import Transaction
+"""
+Try Different Thing in this file to get understanding of how it works
+"""
+from .blockChain import BlockChain
+from .transaction import Transaction
 from ellipticcurve.privateKey import PrivateKey
 
 
