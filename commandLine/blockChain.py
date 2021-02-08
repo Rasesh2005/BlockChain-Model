@@ -1,4 +1,3 @@
-from re import IGNORECASE
 from block import Block
 from transaction import Transaction
 class BlockChain:
