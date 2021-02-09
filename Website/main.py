@@ -89,15 +89,13 @@ def createTransaction():
     if "user" not in session:
         return redirect("/login/")
     if request.method=="POST":
-        sendFrom=remove_escapeChar(to_string(users[session["user"]]["publicKey"],True))
-        if request.form.get("sendFrom")!=sendFrom:
-            return "Transaction Not Valid"
         try:
-            tx=Transaction(request.form.get("sendFrom"),request.form.get("sendTo"),int(request.form.get("amount")))
+            tx=Transaction(remove_escapeChar(to_string(users[session["user"]]["publicKey"],True)),request.form.get("sendTo"),int(request.form.get("amount")))
             tx.sign((users[session["user"]]["privateKey"],users[session["user"]]["publicKey"]))
             mycoin.addTransaction(tx,users[session["user"]]["publicKey"])
-        except:
-            return redirect('/create_transaction/')
+        except Exception as e:
+            print(e)
+            return redirect('/')
         if len(mycoin.pendingTransactions)>=MAX_TRANSACTIONS:
             mycoin.minePendingTransactions(users[session["user"]]["publicKey"])
         return redirect("/")
